@@ -1,15 +1,21 @@
-import streamlit as st
+import pickle
 import numpy as np
-import pickle  # To load the trained model
+import streamlit as st
+from sklearn.preprocessing import StandardScaler
 
-# Load the trained diabetes prediction model
+# Load the trained model
 with open("model.pkl", "rb") as model_file:
     model = pickle.load(model_file)
 
+# Load the scaler
+scaler = StandardScaler()
+scaler.fit([[4,146,85,27,100,28.9,0.189,27]])  # Use sample training data
+
 def predict_diabetes(features):
-    """Make a prediction using the loaded model."""
-    features = np.array(features).reshape(1, -1)  # Convert input to correct format
-    prediction = model.predict(features)[0]
+    """Make a prediction using the loaded model after scaling."""
+    features = np.array(features).reshape(1, -1)
+    features_scaled = scaler.transform(features)  # Apply same transformation
+    prediction = model.predict(features_scaled)[0]
     return "diabetic" if prediction == 1 else "not diabetic"
 
 # Streamlit UI
